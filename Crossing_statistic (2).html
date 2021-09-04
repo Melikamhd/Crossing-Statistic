@@ -1,0 +1,201 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Crossing_statistic</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-08-27"><meta name="DC.source" content="Crossing_statistic.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1></h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Number of level Crossing</a></li><li><a href="#2">Distribution Theory</a></li><li><a href="#3">Gaussian Theory</a></li></ul></div><h2>Number of level Crossing<a name="1"></a></h2><pre class="codeinput">clc
+clear
+f = load(<span class="string">'4.txt'</span>);
+
+t = length(f)*0.02;  <span class="comment">%total time</span>
+M = 21;
+MM = 50;
+mu = mean(f);
+f = f-mu;       <span class="comment">%zero mean</span>
+sigma0 = std(f);
+alpha = f/sigma0;   <span class="comment">% non dimention</span>
+x = linspace(min(alpha),max(alpha),M);
+xx = linspace(min(alpha),max(alpha),MM);
+
+
+N = Number_of_Level_crossing(alpha,M);
+N = Mean_Kernel(N,2);
+N = N./t;
+
+N = spline(x,N,xx);
+Nm = max(N);
+ff = find(N==Nm);
+N = N/max(N);
+</pre><h2>Distribution Theory<a name="2"></a></h2><p><img src="Crossing_statistic_files/Crossing_statistic_eq11505494808790916373.png" alt="$$N_D (\alpha) = \frac{\sigma_1}{\pi\sigma_0}e^{-\alpha^2/2}\left[1+\left(\frac{1}{6}s^{(0)}H_3(\alpha)+\frac{1}{3}s^{(1)}H_1(\alpha)\right)\sigma_0\right]$$"></p><p><img src="Crossing_statistic_files/Crossing_statistic_eq14519552175881669895.png" alt="$$ H_n(\alpha) $$ are the Hermit's Polynomials $$ H_n(\alpha)= e^{\alpha^2/2}\left(-\frac{\partial}{\partial\alpha}  \right)^ne^{-\alpha^2/2}$$"></p><p><img src="Crossing_statistic_files/Crossing_statistic_eq03875017724934183394.png" alt="$$S^{(0)}\equiv \frac{\langle \alpha^3\rangle}{\sigma_0^4} $$ and $$ S^{(1)}\equiv -\frac{3}{4}\frac{\langle \alpha^2\Delta^2 \alpha \rangle}{\sigma_0^2\sigma_1^2} $$"></p><pre class="codeinput">sigma1 = sqrt(-mean(diff(alpha,2).*alpha(2:end-1))*sigma0^2);
+alpha_2 = diff(alpha,2);
+
+nu0 = mean(xx);
+s0 = mean(alpha.^3)/sigma0;
+s1 =(-3/4)*mean(alpha(2:end-1).^2.*alpha_2)*sigma0/sigma1^2;
+H1 = @(nu) nu;
+H3 = @(nu) nu.^3-3*nu;
+D = zeros(MM,1);
+N_p = zeros(MM,1);
+N_p = @(nu) (1/pi)*(sigma1/sigma0)*exp(-nu.^2/(2)).*(1+(s0.*H3(nu)/6+s1.*H1(nu)/3)*sigma0);
+N_per = N_p(xx);
+D =(s0.*H3(xx)/6+s1.*H1(xx)/3)*sigma0;
+
+N_per = N_per/t;
+N_per = N_per/max(N_per);
+</pre><h2>Gaussian Theory<a name="3"></a></h2><p><img src="Crossing_statistic_files/Crossing_statistic_eq12510496000712105764.png" alt="$$N_G =\frac{1}{\sqrt{2\pi}}e^{-v^2/2}$$"></p><pre class="codeinput">G = @(v)(1/sqrt(2*pi))*exp(-v.^2/2);
+G = G(xx)/max(G(xx));
+
+
+figure(1);ax = gca;
+
+plot(xx,G,<span class="string">'k'</span>,<span class="string">'linewidth'</span>,3)
+hold <span class="string">on</span>
+plot(xx,N_per,<span class="string">'Ob'</span>,<span class="string">'linewidth'</span>,1,<span class="string">'MarkerSize'</span>,10,<span class="string">'MarkerFaceColor'</span>,<span class="string">'b'</span>)
+plot(xx,N,<span class="string">'sk'</span>,<span class="string">'linewidth'</span>,1,<span class="string">'MarkerSize'</span>,10,<span class="string">'MarkerFaceColor'</span>,<span class="string">'r'</span>)
+ax.FontSize = 16;
+ax.LineWidth = 1.5;
+xlabel(<span class="string">'\alpha'</span>,<span class="string">'fontsize'</span>,18)
+ylabel(<span class="string">'Normalized N_\alpha'</span>,<span class="string">'fontsize'</span>,18)
+legend(<span class="string">'Gaussian'</span>,<span class="string">'Non-Gaussian'</span>,<span class="string">'Experimental N_\alpha'</span>)
+axis([-3 4 0 1.1])
+hold <span class="string">off</span>
+</pre><img vspace="5" hspace="5" src="Crossing_statistic_files/Crossing_statistic_01.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB® R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+
+%%   Number of level Crossing
+
+clc
+clear
+f = load('4.txt');
+
+t = length(f)*0.02;  %total time
+M = 21;
+MM = 50;
+mu = mean(f);
+f = f-mu;       %zero mean
+sigma0 = std(f);
+alpha = f/sigma0;   % non dimention
+x = linspace(min(alpha),max(alpha),M);
+xx = linspace(min(alpha),max(alpha),MM);
+
+
+N = Number_of_Level_crossing(alpha,M);
+N = Mean_Kernel(N,2);
+N = N./t;
+
+N = spline(x,N,xx);
+Nm = max(N);
+ff = find(N==Nm);
+N = N/max(N);
+
+%%    Distribution Theory
+% 
+% $$N_D (\alpha) = \frac{\sigma_1}{\pi\sigma_0}e^{-\alpha^2/2}\left[1+\left(\frac{1}{6}s^{(0)}H_3(\alpha)+\frac{1}{3}s^{(1)}H_1(\alpha)\right)\sigma_0\right]$$
+% 
+% $$ H_n(\alpha) $$ are the Hermit's Polynomials $$ H_n(\alpha)= e^{\alpha^2/2}\left(-\frac{\partial}{\partial\alpha}  \right)^ne^{-\alpha^2/2}$$
+%
+% $$S^{(0)}\equiv \frac{\langle \alpha^3\rangle}{\sigma_0^4} $$ and $$ S^{(1)}\equiv -\frac{3}{4}\frac{\langle \alpha^2\Delta^2 \alpha \rangle}{\sigma_0^2\sigma_1^2} $$
+
+sigma1 = sqrt(-mean(diff(alpha,2).*alpha(2:end-1))*sigma0^2);
+alpha_2 = diff(alpha,2);
+
+nu0 = mean(xx);
+s0 = mean(alpha.^3)/sigma0;
+s1 =(-3/4)*mean(alpha(2:end-1).^2.*alpha_2)*sigma0/sigma1^2;
+H1 = @(nu) nu;
+H3 = @(nu) nu.^3-3*nu;
+D = zeros(MM,1);
+N_p = zeros(MM,1);
+N_p = @(nu) (1/pi)*(sigma1/sigma0)*exp(-nu.^2/(2)).*(1+(s0.*H3(nu)/6+s1.*H1(nu)/3)*sigma0);
+N_per = N_p(xx);
+D =(s0.*H3(xx)/6+s1.*H1(xx)/3)*sigma0;
+
+N_per = N_per/t;
+N_per = N_per/max(N_per);
+
+%%    Gaussian Theory
+% 
+% $$N_G =\frac{1}{\sqrt{2\pi}}e^{-v^2/2}$$
+% 
+
+G = @(v)(1/sqrt(2*pi))*exp(-v.^2/2);
+G = G(xx)/max(G(xx));
+
+
+figure(1);ax = gca;
+
+plot(xx,G,'k','linewidth',3)
+hold on
+plot(xx,N_per,'Ob','linewidth',1,'MarkerSize',10,'MarkerFaceColor','b')
+plot(xx,N,'sk','linewidth',1,'MarkerSize',10,'MarkerFaceColor','r')
+ax.FontSize = 16;
+ax.LineWidth = 1.5;
+xlabel('\alpha','fontsize',18)
+ylabel('Normalized N_\alpha','fontsize',18)
+legend('Gaussian','Non-Gaussian','Experimental N_\alpha')
+axis([-3 4 0 1.1])
+hold off
+
+
+##### SOURCE END #####
+--></body></html>
